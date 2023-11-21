@@ -22,20 +22,15 @@ KEY =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp
 sp: Client = create_client(URL,KEY)
 conn = psyc.connect(host = "db.jpztuzgyiluqazttymmb.supabase.co",port="5432",database="postgres",user="postgres",password= "qlJb4WrwJc5UdzF1")
 cur = conn.cursor()
-Tablas = []
-
-cur.execute("""SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'""")
-for table in cur.fetchall():  
-    print(table)
-    Tablas.append(str(table).replace("'", "").replace(",", "").replace("(", "").replace(")", "")) 
 
 async def main():
     config = uvi.Config("main:app", port=5000, log_level="info")
     server = uvi.Server(config)
-    await server.serve()
+    await server.serve() 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main()) 
+    
 
 #CRUD
 @app.get('/')
@@ -44,9 +39,18 @@ def greeting():
 
 @app.get('/tables')
 def getTables():
+    Tablas = []
+    cur.execute("""SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'""")
+    for table in cur.fetchall():  
+        print(table)
+        Tablas.append(str(table).replace("'", "").replace(",", "").replace("(", "").replace(")", "")) 
+    conn.commit()
     return Tablas
 
 @app.get('/users')
 def getUsers():
-    
-    return "hola"
+    cur.execute("""SELECT * FROM infoUsuarios""")
+    for user in cur.fetchall():
+        print(user)
+    conn.commit()
+    return "exito"
