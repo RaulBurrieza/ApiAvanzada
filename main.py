@@ -56,6 +56,8 @@ def initUvicorn():
     if __name__ == "__main__":
         asyncio.run(main())
         
+    proceso = subprocess.Popen(navInit, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)     
+      
     @app.get('/', include_in_schema=False)
     async def docs_redirect():
         response = RedirectResponse(url='/docs')
@@ -75,9 +77,9 @@ def initUvicorn():
             return jsonUsers
         
     #operaciones POST
-        
+   
 
     
 initUvicorn()
 
-proceso = subprocess.Popen(navInit, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
