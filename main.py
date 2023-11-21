@@ -30,8 +30,6 @@ app = FastAPI(
 )
 
 
-navInit ="start chrome http://127.0.0.1:5000"
-
 #Conexiones
 URL = "https://jpztuzgyiluqazttymmb.supabase.co"
 KEY =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwenR1emd5aWx1cWF6dHR5bW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4NTI4NTcsImV4cCI6MjAxMjQyODg1N30.R1ppxbGbX0pJ2rDysdlqdJ3QXiDvvjOtV-d5WuepWVQ"
@@ -55,8 +53,7 @@ def initUvicorn():
 
     if __name__ == "__main__":
         asyncio.run(main())
-        
-    proceso = subprocess.Popen(navInit, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)     
+             
       
     @app.get('/', include_in_schema=False)
     async def docs_redirect():
