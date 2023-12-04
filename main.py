@@ -36,31 +36,56 @@ KEY =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp
 sp: Client = create_client(URL,KEY)
 conn = psyc.connect(host = "db.jpztuzgyiluqazttymmb.supabase.co",port="5432",database="postgres",user="postgres",password= "qlJb4WrwJc5UdzF1")
 cur = conn.cursor()
-Tablas = []
-
+Tables = []
 cur.execute("""SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'""")
 for table in cur.fetchall():  
-    print(table)
-    Tablas.append(str(table).replace("'", "").replace(",", "").replace("(", "").replace(")", "")) 
+    Tables.append(str(table).replace("'", "").replace(",", "").replace("(", "").replace(")", ""))
+       
+def initUvicorn():
+    async def main():
+        config = uvi.Config("main:app", port=5000, log_level="info")
+        server = uvi.Server(config)
+        await server.serve()
 
-async def main():
-    config = uvi.Config("main:app", port=5000, log_level="info")
-    server = uvi.Server(config)
-    await server.serve()
+    if __name__ == "__main__":
+        asyncio.run(main())
+             
+      
+    @app.get('/', include_in_schema=False)
+    async def docs_redirect():
+        response = RedirectResponse(url='/docs')
+        return response
 
-if __name__ == "__main__":
-    asyncio.run(main())
+    #operaciones GET
 
-#CRUD
-@app.get('/')
-def greeting():
-    return "hola"
-
-@app.get('/tables')
-def getTables():
-    return Tablas
-
-@app.get('/users')
-def getUsers():
+    @app.get('/tables')
+    def getTables():
+        return Tables
     
-    return "hola"
+    @app.get('/tables/{id}')
+    def getTablaInfo(id:int):
+            data = sp.table(Tables[id]).select("*").execute()
+            tableInfo = data.model_dump_json()
+            jsonUsers = json.loads(tableInfo)
+            return jsonUsers
+    
+    @app.get('/usuarios')
+    def getUser():
+        data = sp.table('cuenta').select("*").execute()
+        tableInfo = data.model_dump_json()
+        jsonUsers = json.loads(tableInfo)
+        return jsonUsers
+    
+    @app.get('/usuarios/{id}')
+    def getUser(id:int):
+            data = sp.table('infousuario').select("*").execute()
+            tableInfo = data.model_dump_json()
+            jsonUser = json.loads(tableInfo)
+            return jsonUser
+            
+        
+    #operaciones POST
+   
+
+    
+initUvicorn()
