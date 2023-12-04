@@ -100,9 +100,13 @@ while True:
             user_info = sign_inApi(User, Password)
 
             if user_info:
-                config = uvi.Config("Api:app", port=5000, log_level="info")
-                server = uvi.Server(config)
-                uvi.start(server)
+                async def main():
+                    config = uvi.Config("Api:app", port=5000, log_level="info")
+                    server = uvi.Server(config)
+                    await server.serve()
+
+                if __name__ == "__main__":
+                    asyncio.run(main())
 
         elif elec_login == '2':
             User = input("Nombre Usuario: ")
