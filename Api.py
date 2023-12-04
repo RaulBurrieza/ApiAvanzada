@@ -15,13 +15,7 @@ class infoUsuario(BaseModel):
 app = FastAPI(
     title="Api Avanzada"
 )
-
-
-cur.execute("""SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'""")
-for table in cur.fetchall():  
-    Tablas.append(str(table).replace("'", "").replace(",", "").replace("(", "").replace(")", ""))
-
-     
+   
 #operaciones GET 
 @app.get('/', include_in_schema=False)
 async def docs_redirect():
@@ -33,11 +27,17 @@ def getTables():
     return Tablas
 
 @app.get('/tables/{id}')
-def getTablaInfo(id:int):
-    data = sp.table(Tablas[id]).select("*").execute()
-    tableInfo = data.model_dump_json()
-    jsonUsers = json.loads(tableInfo)
-    return jsonUsers
+def getTablaInfo(id: int):
+    if id < 0 or id >= len(Tablas):
+        raise HTTPException(status_code=404, detail="Tabla no encontrada")
+
+    try:
+        data = sp.table(Tablas[id]).select("*").execute()
+        tableInfo = data.model_dump_json()
+        jsonUsers = json.loads(tableInfo)
+        return jsonUsers
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error al obtener información de la tabla")
 
   
 #operaciones POST
