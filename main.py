@@ -1,5 +1,8 @@
 from utils import *
 
+#Funciones
+
+#Crear Tabla
 def create_Table():
     nombreTabla = input("Introduzca el nombre de la tabla: ")
     cantColumns = input("¿Cuantas columnas quieres meter? ")
@@ -31,7 +34,7 @@ def create_Table():
     except Exception as e:
         print("Error al crear la tabla:", str(e))
 
-    
+#Borrar Tabla
 def delete_Table():
     show_Tables()
     nombreTabla = input("Introduzca el nombre de la tabla que quiere borrar: ")
@@ -43,12 +46,13 @@ def delete_Table():
     except Exception as e:
         print("Error al eliminar la tabla:", str(e))
 
+#Mostrar Tablas
 def show_Tables():
     print("######\nTablas\n#####")
     for tabla in Tablas:
         print(tabla)
 
-
+#Registrarase en la API
 def sign_upApi(User, Password):
     print("#####\nRegister\n#####")
     try:
@@ -59,6 +63,7 @@ def sign_upApi(User, Password):
         print("Error al registrar el usuario:", str(e))
         return None
 
+#Logarse en la API
 def sign_inApi(User, Password):
     print("#####\nLOGIN\n#####")
     try:
@@ -68,7 +73,32 @@ def sign_inApi(User, Password):
     except Exception as e:
         print("Error al iniciar sesión:", str(e))
         return None
+    
+#Iniciar fastApi  
+def initFastApi():
+    async def main():
+        config = uvi.Config("Api:app", port=5000, log_level="info")
+        server = uvi.Server(config)
+        await server.serve()
 
+    if __name__ == "__main__":
+        asyncio.run(main())
+
+#Crear rol
+def create_Role(name):
+    print("Selecciona lo que puede hacer este rol: ")
+    try:
+        cur.execute(f"""CREATE ROLE {name}""")
+        print(f"El rol {name} ha sido creado con exito")
+    except Exception as e:
+        print(f"Error al crear {name}, por {e}")
+
+def delete_role(name):
+    try:
+        cur.execute(f"""DROP ROLE {name}""")
+        print(f"El rol {name} ha sido borrado con exito")  
+    except Exception as e:
+        print(f"Error al borrar {name}, por {e}")
 
 print("Bienvenido!!!")
 
@@ -100,13 +130,7 @@ while True:
             user_info = sign_inApi(User, Password)
 
             if user_info:
-                async def main():
-                    config = uvi.Config("Api:app", port=5000, log_level="info")
-                    server = uvi.Server(config)
-                    await server.serve()
-
-                if __name__ == "__main__":
-                    asyncio.run(main())
+                initFastApi()
 
         elif elec_login == '2':
             User = input("Nombre Usuario: ")
@@ -142,6 +166,17 @@ while True:
                                             'rolcreatedb', 'rolcanlogin', 'rolreplication', 'rolconnlimit', 
                                             'rolpassword', 'rolvaliduntil', 'rolbypassrls', 'rolconfig','oid'])
             print(df)
+
+        if elec_roles == '2': 
+            name = input("Meta el nombre del rol: ")
+            password = input("Meta la contraseña del rol: ")
+            create_Role(name, password)
+            
+        if elec_roles == '3':
+            name = input("Meta el nombre del rol")
+            delete_role(name)
+        
+
 
     elif elec == '5':
         break 
