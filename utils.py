@@ -9,7 +9,7 @@ import psycopg2 as psyc
 import uvicorn as uvi
 import asyncio
 import json
-import hashlib as hlb
+import hashlib
 import requests as rq
 from fastapi.responses import RedirectResponse
 import pandas as pd

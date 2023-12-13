@@ -32,7 +32,7 @@ def create_Table():
         conn.commit()
         print("Tabla creada exitosamente.")
     except Exception as e:
-        print("Error al crear la tabla:", str(e))
+        print(f"Error al crear la tabla: {e}")
 
 #Borrar Tabla
 def delete_Table():
@@ -44,7 +44,8 @@ def delete_Table():
         conn.commit()
         print("Tabla eliminada exitosamente.")
     except Exception as e:
-        print("Error al eliminar la tabla:", str(e))
+        print(f"Error al eliminar la tabla: {e}")
+
 
 #Mostrar Tablas
 def show_Tables():
@@ -52,28 +53,55 @@ def show_Tables():
     for tabla in Tablas:
         print(tabla)
 
-#Registrarase en la API
-def sign_upApi(User, Password):
-    print("#####\nRegister\n#####")
+#Registrarase en la API de supabase
+def sign_up(User, Password):
+    print("#####\nRegister Suapabase API\n#####")
     try:
         usuario = sp.auth.sign_up({"email": User + "@gmail.com", "password": Password})
         print("Usuario registrado exitosamente.")
         return usuario
     except Exception as e:
-        print("Error al registrar el usuario:", str(e))
+        print(f"Error al registrar el usuario: {e}")
         return None
 
-#Logarse en la API
-def sign_inApi(User, Password):
-    print("#####\nLOGIN\n#####")
+#Logarse en la API de supabase
+def sign_in(User, Password):
+    print("#####\nLOGIN Supabase API\n#####")
     try:
         usuario = sp.auth.sign_in_with_password({"email": User + "@gmail.com", "password": Password})
         print("Inicio de sesión exitoso.")
         return usuario
     except Exception as e:
-        print("Error al iniciar sesión:", str(e))
+        print(f"Error al iniciar sesión: {e}")
         return None
-    
+     
+#Logarse en la BD
+def login(Usuario, Password):
+    print("#####\nLOGIN\n#####")
+    try:
+        Password = hashPassword(Password)
+        print(Password)
+        cur.execute(f"""SELECT rol FROM "Usuarios_BD" WHERE nombre = '{Usuario}' AND contraseña = '{Password}' """)
+        rol = str(cur.fetchall())
+        print(rol)
+        return rol.replace("'", "").replace(",", "").replace("(", "").replace(")", "").replace("]", "").replace("[", "")
+    except Exception as e:
+        print(f"{e}")
+        return ''
+        
+#Registrarse en la BD
+def register(Usuario, Password):
+    print("#####\nRegister\n#####")
+    Password = hashPassword(Password)
+    print(Password)
+    try:
+        cur.execute(f"""INSERT INTO "Usuarios_BD"(nombre,contraseña,rol) VALUES('{Usuario}', '{Password}', 'User'); """)
+        conn.commit()
+        print("Ejecutado")
+    except Exception as e:
+        print(f"{e}")
+        return '' 
+
 #Iniciar fastApi  
 def initFastApi():
     async def main():
@@ -83,103 +111,106 @@ def initFastApi():
 
     if __name__ == "__main__":
         asyncio.run(main())
-
-#Crear rol
-def create_Role(name):
-    print("Selecciona lo que puede hacer este rol: ")
-    try:
-        cur.execute(f"""CREATE ROLE {name}""")
-        print(f"El rol {name} ha sido creado con exito")
-    except Exception as e:
-        print(f"Error al crear {name}, por {e}")
-
-def delete_role(name):
-    try:
-        cur.execute(f"""DROP ROLE {name}""")
-        print(f"El rol {name} ha sido borrado con exito")  
-    except Exception as e:
-        print(f"Error al borrar {name}, por {e}")
+        
+#Hashear contraseña
+def hashPassword(password):
+    hash_object = hashlib.md5(password.encode())
+    return hash_object.hexdigest()
 
 print("Bienvenido!!!")
 
-while True:
-    elec = input("""  
-    ¿Qué quiere hacer?            
-    ###########################################
-        1. Iniciar FastApi
-        2. Crear Tabla 
-        3. Borrar Tabla
-        4. Gestionar Roles
-        5. Salir
-    ###########################################      
-    """)
+elec_login = input("""            
+1. Logarse
+2. Registrarse                  
+""")
+if elec_login == '1':
+    nombre = input("Nombre: ")
+    password = input("Contraseña: ")
+    UsuarioRol =  login(nombre, password)
+    
 
-    if elec == '1':
-        elec_login = input("""  
-        ¿Qué quiere hacer?            
-        ###########################################
-            1. Logarse con un usuario de la API
-            2. Registrarse en la API
-            3. Volver
-        ###########################################      
-        """)
-
-        if elec_login == '1':
-            User = input("Nombre de usuario: ")
-            Password = input("Contraseña: ")
-            user_info = sign_inApi(User, Password)
-
-            if user_info:
-                initFastApi()
-
-        elif elec_login == '2':
-            User = input("Nombre Usuario: ")
-            Password = input("Contraseña: ")
-            user_info = sign_upApi(User, Password)
-
-            if user_info:
-                sign_inApi(User, Password)
-
-    elif elec == '2':
-        create_Table()
-
-    elif elec == '3':
-        delete_Table()
-
-    elif elec == '4':
-        elec_roles = input("""  
-        ¿Qué quiere hacer?            
-        ###########################################
-            1. Ver roles
-            2. Crear un rol
-            3. Borrar un rol
-            4. Modificar un rol
-            5. Volver
-        ###########################################      
-        """)
-
-        if elec_roles == '1':
-            print("ROLES: ")
-            cur.execute("SELECT * FROM pg_roles;")
-            roles = cur.fetchall()
-            df = pd.DataFrame(roles,  columns=['rolname', 'rolsuper', 'rolinherit', 'rolcreaterole', 
-                                            'rolcreatedb', 'rolcanlogin', 'rolreplication', 'rolconnlimit', 
-                                            'rolpassword', 'rolvaliduntil', 'rolbypassrls', 'rolconfig','oid'])
-            print(df)
-
-        if elec_roles == '2': 
-            name = input("Meta el nombre del rol: ")
-            password = input("Meta la contraseña del rol: ")
-            create_Role(name, password)
-            
-        if elec_roles == '3':
-            name = input("Meta el nombre del rol")
-            delete_role(name)
+if elec_login == '2':
+    print("Al registrarte serás un usuario con privilegios básicos")
+    nombre = input("Nombre: ")
+    password = input("Contraseña: ")
+    register(nombre, password)
+    UsuarioRol = login(nombre, password)
         
+if UsuarioRol == 'User' or UsuarioRol=='Admin' or UsuarioRol=='Reader':
+    while True:
+        elec = input("""  
+        ¿Qué quiere hacer?            
+        ###########################################
+            1. Iniciar FastApi
+            2. Realizar operaciones en la BD
+            3. Salir
+        ###########################################      
+        """)
 
+        if elec == '1' and (UsuarioRol == 'Usuario' or UsuarioRol == 'Admin'):
+            elec_login = input("""  
+            ¿Qué quiere hacer?            
+            ###########################################
+                1. Logarse en la API de supabase
+                2. Registrarse en la API de supabase
+                3. Volver
+            ###########################################      
+            """)
 
-    elif elec == '5':
-        break 
+            if elec_login == '1':
+                User = input("Nombre de usuario: ")
+                Password = input("Contraseña: ")
+                user_info = sign_in(User, Password)
+                if user_info:
+                    initFastApi()
+                    
+            if elec_login == '2':
+                User = input("Nombre de usuario: ")
+                Password = input("Contraseña: ")
+                user_info = sign_up(User, Password)
+                if user_info:
+                    sign_in(User, Password)
+                    
+        if elec == '2':
+            elec_BD = input(""" 
+                    ¿Qué quieres hacer?
+                    
+                    1. Crear Tabla
+                    2. Borrar Tabla
+                    3. Gestionar Roles
+                            """)
+            
+            if elec_BD == '1' and UsuarioRol == 'Admin':
+                create_Table()
 
-    else:
-        print("Por favor, seleccione una opción válida.")
+            elif elec_BD == '2' and UsuarioRol == 'Admin':
+                delete_Table()
+
+            elif elec_BD == '3':
+                elec_roles = input("""  
+                ¿Qué quiere hacer?            
+                ###########################################
+                    1. Ver roles
+                    2. Crear un rol
+                    3. Borrar un rol
+                    4. Modificar un rol
+                    5. Volver
+                ###########################################      
+                """)
+
+                if elec_roles == '1':
+                    print("ROLES: ")
+                    cur.execute("""SELECT * FROM "Rol";""")
+                    roles = cur.fetchall()
+                    df = pd.DataFrame(roles,  columns=['rolname'])
+                    print(df)
+
+            
+        elif elec == '3':
+            break 
+
+        else:
+            print("Por favor, seleccione una opción válida.")
+            
+else:
+    print("No puedes acceder")
