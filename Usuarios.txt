@@ -1,0 +1,5 @@
+
+Usuarios_BD:
+Administrador, Contraseña: SoyElqueAdministra,  Rol: Admin
+
+Lector, Contraseña: SoyElqueLee, Rol: Reader
