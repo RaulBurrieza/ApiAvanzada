@@ -129,10 +129,6 @@ if elec_login == '1':
     UsuarioRol =  login(nombre, password)
     
 
-<<<<<<< HEAD
-if elec == '5':
-    print("Desarrollo")
-=======
 if elec_login == '2':
     print("Al registrarte serás un usuario con privilegios básicos")
     nombre = input("Nombre: ")
@@ -218,4 +214,3 @@ if UsuarioRol == 'User' or UsuarioRol=='Admin' or UsuarioRol=='Reader':
             
 else:
     print("No puedes acceder")
->>>>>>> 86f76ad503b701b51d004702568d65c4156460cd

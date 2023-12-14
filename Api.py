@@ -4,11 +4,7 @@ from models import *
 app = FastAPI(
     title="Api Avanzada"
 )
-<<<<<<< HEAD
-     
-=======
    
->>>>>>> 86f76ad503b701b51d004702568d65c4156460cd
 #operaciones GET 
 @app.get('/', include_in_schema=False)
 async def docs_redirect():
@@ -21,7 +17,6 @@ def getTables():
     return Tablas
 
 @app.get('/tables/{id}')
-<<<<<<< HEAD
 def getTablaInfo(id:int):
     data = sp.table(Tablas[id]).select("*").execute()
     tableInfo = data.model_dump_json()
@@ -87,7 +82,6 @@ def getTablaInfo(id:int):
     tableInfo = data.model_dump_json()
     jsonUsers = json.loads(tableInfo)
     return jsonUsers
-=======
 def getTablaInfo(id: int):
     if id < 0 or id >= len(Tablas):
         raise HTTPException(status_code=404, detail="Tabla no encontrada")
@@ -99,7 +93,6 @@ def getTablaInfo(id: int):
         return jsonUsers
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error al obtener información de la tabla")
->>>>>>> 86f76ad503b701b51d004702568d65c4156460cd
 
   
 #operaciones POST
