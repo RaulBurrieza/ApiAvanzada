@@ -17,6 +17,8 @@ import httpx
 from fastapi import HTTPException
 from fastapi import Depends
 
+
+
 #Endpoint Supabase API
 URL = "https://jpztuzgyiluqazttymmb.supabase.co"
 #Public Key
@@ -28,6 +30,8 @@ conn = psyc.connect(host = "db.jpztuzgyiluqazttymmb.supabase.co",port="5432",dat
 cur = conn.cursor()
 
 Tablas = []
+
+UsuarioRol = None
 
 cur.execute("""SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'""")
 for table in cur.fetchall():  

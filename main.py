@@ -1,5 +1,5 @@
 from utils import *
-
+import utils
 #Funciones
 
 #Crear Tabla
@@ -111,7 +111,7 @@ def initFastApi():
 
     if __name__ == "__main__":
         asyncio.run(main())
-        
+      
 #Hashear contraseña
 def hashPassword(password):
     hash_object = hashlib.md5(password.encode())
@@ -123,39 +123,41 @@ elec_login = input("""
 1. Logarse
 2. Registrarse                  
 """)
+
+
 if elec_login == '1':
     nombre = input("Nombre: ")
     password = input("Contraseña: ")
-    UsuarioRol =  login(nombre, password)
+    utils.UsuarioRol = login(nombre, password)
     
 
-if elec_login == '2':
+elif elec_login == '2':
     print("Al registrarte serás un usuario con privilegios básicos")
     nombre = input("Nombre: ")
     password = input("Contraseña: ")
     register(nombre, password)
-    UsuarioRol = login(nombre, password)
-        
-if UsuarioRol == 'User' or UsuarioRol=='Admin' or UsuarioRol=='Reader':
+    utils.UsuarioRol = login(nombre, password)
+
+if utils.UsuarioRol in ('User', 'Admin', 'Reader'):
     while True:
         elec = input("""  
-        ¿Qué quiere hacer?            
-        ###########################################
-            1. Iniciar FastApi
-            2. Realizar operaciones en la BD
-            3. Salir
-        ###########################################      
-        """)
+¿Qué quiere hacer?            
+###########################################
+    1. Iniciar FastApi
+    2. Realizar operaciones en la BD
+    3. Salir
+###########################################      
+""")
 
-        if elec == '1' and (UsuarioRol == 'Usuario' or UsuarioRol == 'Admin'):
+        if elec == '1' and utils.UsuarioRol in ('User', 'Admin', 'Reader'):
             elec_login = input("""  
-            ¿Qué quiere hacer?            
-            ###########################################
-                1. Logarse en la API de supabase
-                2. Registrarse en la API de supabase
-                3. Volver
-            ###########################################      
-            """)
+¿Qué quiere hacer?            
+###########################################
+1. Logarse en la API de supabase
+2. Registrarse en la API de supabase
+3. Volver
+###########################################      
+""")
 
             if elec_login == '1':
                 User = input("Nombre de usuario: ")
@@ -171,46 +173,53 @@ if UsuarioRol == 'User' or UsuarioRol=='Admin' or UsuarioRol=='Reader':
                 if user_info:
                     sign_in(User, Password)
                     
-        if elec == '2':
+        elif elec == '2':
+            if utils.UsuarioRol != 'Admin':
+                print("No tienes permisos para esta opción")
+                continue
+                
             elec_BD = input(""" 
-                    ¿Qué quieres hacer?
-                    
-                    1. Crear Tabla
-                    2. Borrar Tabla
-                    3. Gestionar Roles
-                            """)
+¿Qué quieres hacer?
+
+1. Crear Tabla
+2. Borrar Tabla
+3. Gestionar Roles
+        """)
             
-            if elec_BD == '1' and UsuarioRol == 'Admin':
+            if elec_BD == '1':
                 create_Table()
 
-            elif elec_BD == '2' and UsuarioRol == 'Admin':
+            elif elec_BD == '2':
                 delete_Table()
 
             elif elec_BD == '3':
                 elec_roles = input("""  
-                ¿Qué quiere hacer?            
-                ###########################################
-                    1. Ver roles
-                    2. Crear un rol
-                    3. Borrar un rol
-                    4. Modificar un rol
-                    5. Volver
-                ###########################################      
-                """)
+¿Qué quiere hacer?            
+###########################################
+    1. Ver roles
+    2. Crear un rol
+    3. Volver
+###########################################      
+""")
 
-                if elec_roles == '1':
+                if elec_roles == '1' and utils.UsuarioRol in ('Admin', 'Reader'):
                     print("ROLES: ")
                     cur.execute("""SELECT * FROM "Rol";""")
                     roles = cur.fetchall()
                     df = pd.DataFrame(roles,  columns=['rolname'])
                     print(df)
 
+                elif elec_roles == '2' and utils.UsuarioRol in ('Admin'):
+                    nombre = input("Meta el nombre del rol: ")
+                    cur.execute(f"""INSERT INTO "Rol"(nombre) VALUES('{nombre}'); """)
+                    conn.commit
             
         elif elec == '3':
+            conn.close()
             break 
 
         else:
             print("Por favor, seleccione una opción válida.")
             
-else:
+if utils.UsuarioRol not in ('User', 'Admin', 'Reader'):
     print("No puedes acceder")

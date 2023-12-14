@@ -1,7 +1,13 @@
 from pydantic import BaseModel
 
+
+class userInfo(BaseModel):
+    name: str
+    email: str
+    phoneNum: str
+    password: str
+    Date: str
 class User(BaseModel):
-    id: int
     userName: str
     password: str
     
@@ -11,12 +17,6 @@ class Song(BaseModel):
     genre: str
     artist: str
     album: str
-
-class userInfo(BaseModel):
-    name: str
-    email: str
-    phoneNum: str
-    password: str
 
 class Post(BaseModel):
     userName: str
