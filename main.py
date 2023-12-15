@@ -119,9 +119,12 @@ def hashPassword(password):
 
 print("Bienvenido!!!")
 
-elec_login = input("""            
+elec_login = input("""
+¿Qué quieres hacer?
+###############        
 1. Logarse
-2. Registrarse                  
+2. Registrarse
+###############                 
 """)
 
 
@@ -180,10 +183,11 @@ if utils.UsuarioRol in ('User', 'Admin', 'Reader'):
                 
             elec_BD = input(""" 
 ¿Qué quieres hacer?
-
+##################
 1. Crear Tabla
 2. Borrar Tabla
 3. Gestionar Roles
+###################
         """)
             
             if elec_BD == '1':

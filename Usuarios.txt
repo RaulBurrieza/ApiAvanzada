@@ -1,5 +1,5 @@
 
-Usuarios_BD:
+Usuarios_BD(No son los mismos que los usuarios de la API de supabase):
 Administrador, Contraseña:SoyElqueAdministra,  Rol: Admin
 
 Lector, Contraseña:SoyElqueLee, Rol: Reader
